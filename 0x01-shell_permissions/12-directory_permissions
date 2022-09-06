@@ -1,2 +1,2 @@
 #!/bin/bash
-chmod mkdir my_dir -rwx 751
+chmod 777 path/my_dir
