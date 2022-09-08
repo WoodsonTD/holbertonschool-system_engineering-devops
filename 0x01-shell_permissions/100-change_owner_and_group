@@ -1,2 +1,2 @@
 #!/bin/bash
-chown vincent grep -R | chgrp staff grep -R
+sudo chown -R vincent:staff 
