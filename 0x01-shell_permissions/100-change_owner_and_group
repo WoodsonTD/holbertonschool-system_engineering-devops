@@ -1,2 +1,2 @@
 #!/bin/bash
-chown vincent sed | chgrp staff sed
+chown vincent grep -R | chgrp staff grep -R
