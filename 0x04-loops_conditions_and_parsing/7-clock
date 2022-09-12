@@ -4,11 +4,12 @@ h=0
 m=1
 while [ $h -le 12 ]
 do
+	m=1
         echo "Hour: ${h}"
-        while [ $m -lt 60 ]
+        while [ $m -le 59 ]
         do
         echo $m
-         ((m=1))
+         ((m++))
  done
-         ((h+=1))
+         ((h++))
 done
