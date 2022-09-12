@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-until best school loop
+# until best school loop
 i=0
 until (( i == 10 ));
 do
