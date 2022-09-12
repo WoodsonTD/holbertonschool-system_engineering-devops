@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # more loops sad face
 while
-[ $i -le 20 ]
+[ "$i" -le 20 ]
 do
 	echo "$i"
 	case $i in
