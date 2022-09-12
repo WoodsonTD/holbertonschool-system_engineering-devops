@@ -9,5 +9,5 @@ if
 ["$i" -eq 9];
 then
 echo "Hi";
-(( i++ ));
+fi (( i++ ));
 done
