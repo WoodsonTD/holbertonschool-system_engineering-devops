@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-echo "$$" ps -bash
+#PID along with process name
+echo "$$" p grep | -bash
