@@ -6,3 +6,4 @@ if [ $1 -eq 0 ]
   else
     echo “fail”
 fi
+ping -c 5 "$1"
