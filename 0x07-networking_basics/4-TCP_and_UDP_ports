@@ -1,1 +1,2 @@
-sudo netstat -tulp
+#!/usr/bin/env bash
+netstat -l --program
