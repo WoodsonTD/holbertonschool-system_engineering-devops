@@ -1,0 +1,9 @@
+#!/bin/bash
+ping -c1 10.1.1.23 > /dev/null
+if [ $? -eq 0 ]
+  then 
+    echo "Usage: 5-is_the_host_on_the_network {IP_ADDRESS}"
+    exit 0
+  else
+    echo “fail”
+fi
