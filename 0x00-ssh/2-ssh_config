@@ -17,8 +17,8 @@ Host 5583-web-02
     IdentityFile ~/.ssh/school
     IdentitiesOnly yes
 
-  Host 5583-lb-01
-    HostName 
+Host 5583-lb-01
+    HostName 13.38.98.207
     User ubuntu
     IdentityFile ~/.ssh/school
     IdentitiesOnly yes
