@@ -1,51 +1,57 @@
 #!/usr/bin/python3
-"""exports an employee's tasks to a CSV file"""
-import sys
-import requests
+"""extends the script from 0 to export data in CSV"""
+
 import csv
+import requests
+from sys import argv, exit
 
 
-def export_employee_tasks_to_csv(employee_id):
-    # Retrieve employee data from the JSONPlaceholder API
-    employee_data_request = requests.get(
-        f'https://jsonplaceholder.typicode.com/users/{employee_id}'
-    )
-    employee_data = employee_data_request.json()
+def get_employee_data(employee_id):
+    """gets employee progress from their employee ID"""
+    baseurl = "https://jsonplaceholder.typicode.com"
 
-    # Retrieve employee tasks from the JSONPlaceholder API
-    employee_tasks_request = requests.get(
-        f'https://jsonplaceholder.typicode.com/todos?userId={employee_id}'
-    )
-    employee_tasks = employee_tasks_request.json()
+    user_resp = requests.get("{}/users/{}"
+                            .format(baseurl, employee_id))
+    userdata = user_resp.json()
 
-    # Prepare data for CSV export
-    csv_data = []
-    for task in employee_tasks:
-        csv_data.append([
-            employee_id,
-            employee_data['username'],
-            task['completed'],
-            task['title']
-        ])
+    if 'name' not in userdata:
+        print("Invalid employee ID")
+        return None, None
 
-    # Export CSV data to a file named after the employee ID
-    with open(f'{employee_id}.csv', mode='w', newline='') as csv_file:
-        csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
-        csv_writer.writerows(csv_data)
+    todoresp = requests.get("{}/users/{}/todos"
+                            .format(baseurl, employee_id))
+
+    tododata = todoresp.json()
+
+    return userdata, tododata
+
+
+def export_to_csv(employee_id, userdata, tododata):
+    """exports to CSV format"""
+    fn = "{}.csv".format(employee_id)
+
+    with open(fn, "w", newline="") as csvfile:
+        csvwriter = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+
+        for task in tododata:
+            csvwriter.writerow([employee_id, userdata["username"],
+                                task["completed"], task["title"]])
+
+    print("Data exported to {}".format(fn))
 
 
 if __name__ == '__main__':
-    # Check if the user has provided an employee ID
-    if len(sys.argv) != 2:
-        print("Usage: python3 employee_task_exporter.py <employee_id>")
-        sys.exit(1)
+    if len(argv) != 2:
+        print("Usage: python3 1-export_to_CSV.py <employee_id>")
+        exit(1)
 
-    # Convert the employee ID to an integer
     try:
-        employee_id = int(sys.argv[1])
+        employee_id = int(argv[1])
     except ValueError:
-        print("Employee ID must be an integer.")
-        sys.exit(1)
+        print("Employee ID must be an integer")
+        exit(1)
 
-    # Call the function to export the employee's tasks to a CSV file
-    export_employee_tasks_to_csv(employee_id)
+    userdata, tododata = get_employee_data(employee_id)
+
+    if userdata and tododata:
+        export_to_csv(employee_id, userdata, tododata)

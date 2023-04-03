@@ -1,52 +1,45 @@
 #!/usr/bin/python3
-"""This script gathers data from the JSONPlaceholder API to track the progress
-of an employee's tasks"""
-import sys
+"""gets employee information about their TO DO list"""
+
 import requests
+from sys import argv, exit
 
 
 def get_employee_todo_progress(employee_id):
-    # Make a GET request to retrieve the employee's data
-    employee_data_request = requests.get(
-        f'https://jsonplaceholder.typicode.com/users/{employee_id}'
-    )
-    employee_data = employee_data_request.json()
+    """gets employee progress via their employee ID"""
+    baseurl = "https://jsonplaceholder.typicode.com"
 
-    # Make a GET request to retrieve the employee's tasks
-    employee_tasks_request = requests.get(
-        f'https://jsonplaceholder.typicode.com/todos?userId={employee_id}'
-    )
-    employee_tasks = employee_tasks_request.json()
+    user_resp = requests.get("{}/users/{}"
+                                .format(baseurl, employee_id))
+    userdata = user_resp.json()
 
-    # Count the number of completed tasks
-    completed_tasks = [task for task in employee_tasks if task['completed']]
+    if 'name' not in userdata:
+        print("Invalid employee ID")
+        return
 
-    # Display the results
-    employee_name = employee_data['name']
-    num_completed_tasks = len(completed_tasks)
-    num_total_tasks = len(employee_tasks)
+    todo_resp = requests.get("{}/users/{}/todos"
+                            .format(baseurl, employee_id))
+    tododata = todo_resp.json()
 
-    print(
-        f"Employee {employee_name} has completed {num_completed_tasks} out of "
-        f"{num_total_tasks} tasks:"
-    )
+    completedtasks = [task for task in tododata if task["completed"]]
+    totaltasks = len(tododata)
 
-    for task in completed_tasks:
-        print(f"\t {task['title']}")
+    print("Employee {} is done with tasks({}/{}): "
+        .format(userdata['name'], len(completedtasks), totaltasks))
+
+    for task in completedtasks:
+        print("\t", task["title"])
 
 
-if __name__ == '__main__':
-    # Check if the user has provided an employee ID
-    if len(sys.argv) != 2:
-        print("Usage: python3 employee_task_tracker.py <employee_id>")
-        sys.exit(1)
+if __name__ == "__main__":
+    if len(argv) != 2:
+        print("Usage: python3 0-gather_data_from_an_API.py <employee_id>")
+        exit(1)
 
-    # Convert the employee ID to an integer
     try:
-        employee_id = int(sys.argv[1])
+        employee_id = int(argv[1])
     except ValueError:
-        print("Employee ID must be an integer.")
-        sys.exit(1)
+        print("Employee ID must be an integer")
+        exit(1)
 
-    # Call the function to track the employee's task progress
     get_employee_todo_progress(employee_id)

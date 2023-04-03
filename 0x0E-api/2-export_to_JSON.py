@@ -1,50 +1,62 @@
 #!/usr/bin/python3
-"""exports an employee's tasks to a JSON file"""
-import sys
-import requests
+"""extends the script from 0 to export data in CSV"""
+
 import json
+import requests
+from sys import argv, exit
 
 
-def export_employee_tasks_to_json(employee_id):
-    # Retrieve employee data from the JSONPlaceholder API
-    employee_data_request = requests.get(
-        f'https://jsonplaceholder.typicode.com/users/{employee_id}'
-    )
-    employee_data = employee_data_request.json()
+def get_employee_data(employee_id):
+    """gets employee progress from their employee ID"""
+    baseurl = "https://jsonplaceholder.typicode.com"
 
-    # Retrieve employee tasks from the JSONPlaceholder API
-    employee_tasks_request = requests.get(
-        f'https://jsonplaceholder.typicode.com/todos?userId={employee_id}'
-    )
-    employee_tasks = employee_tasks_request.json()
+    user_resp = requests.get("{}/users/{}"
+                            .format(baseurl, employee_id))
+    userdata = user_resp.json()
 
-    # Prepare data for JSON export
-    tasks = []
-    for task in employee_tasks:
-        tasks.append({
+    if 'name' not in userdata:
+        print("Invalid employee ID")
+        return None, None
+
+    todoresp = requests.get("{}/users/{}/todos"
+                            .format(baseurl, employee_id))
+
+    tododata = todoresp.json()
+
+    return userdata, tododata
+
+
+def export_to_json(employee_id, userdata, tododata):
+    fn = "{}.json".format(employee_id)
+
+    taskdata = []
+    for task in tododata:
+        taskdata.append({
             "task": task["title"],
             "completed": task["completed"],
-            "username": employee_data["username"]
-        })
-    json_data = {str(employee_id): tasks}
+            "username": userdata["username"]
+            })
 
-    # Export JSON data to a file named after the employee ID
-    with open(f'{employee_id}.json', 'w') as json_file:
-        json.dump(json_data, json_file)
+    jsondata = {employee_id: taskdata}
+
+    with open(fn, "w") as jsonfile:
+        json.dump(jsondata, jsonfile)
+
+    print("Data exported to {}".format(fn))
 
 
-if __name__ == '__main__':
-    # Check if the user has provided an employee ID
-    if len(sys.argv) != 2:
-        print("Usage: python3 employee_task_exporter.py <employee_id>")
-        sys.exit(1)
+if __name__ == "__main__":
+    if len(argv) != 2:
+        print("Usage: python3 2-export_to_JSON.py <employee_id>")
+        exit(1)
 
-    # Convert the employee ID to an integer
     try:
-        employee_id = int(sys.argv[1])
+        employee_id = int(argv[1])
     except ValueError:
-        print("Employee ID must be an integer.")
-        sys.exit(1)
+        print("Employee ID must be an integer")
+        exit(1)
 
-    # Call the function to export the employee's tasks to a JSON file
-    export_employee_tasks_to_json(employee_id)
+    userdata, tododata = get_employee_data(employee_id)
+
+    if userdata and tododata:
+        export_to_json(employee_id, userdata, tododata)
