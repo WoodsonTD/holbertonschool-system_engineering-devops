@@ -48,8 +48,6 @@ def export_to_json(all_employees_data):
     with open(file_name, "w") as jsonfile:
         json.dump(all_tasks, jsonfile)
 
-    print("Data exported to {}".format(file_name))
-
 
 if __name__ == "__main__":
     all_employees_data = get_all_employees()
